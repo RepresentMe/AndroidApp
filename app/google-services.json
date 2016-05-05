@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "133014656182",
+    "project_id": "iagr.ee:api-project-133014656182"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:133014656182:android:848c9222172af40e",
+        "android_client_info": {
+          "package_name": "com.softrangers.represent"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKdd9IbeRbfB5ERTq2sJ3sIE9uxvELPCc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-59994709-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
