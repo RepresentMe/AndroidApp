@@ -1,12 +1,8 @@
 package com.softrangers.represent;
 
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Looper;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
@@ -33,9 +29,7 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     private static final String BASE_URL = "https://test.represent.me";
-    private static final String TOKEN_URL = "https://represent.me/api-push/device/gcm/";
-    private static final String AUTH = "/auth/login/";
-    private static final String FB_AUTH = "/auth/token-only-social-auth/";
+    private static final String TOKEN_URL = "https://test.represent.me/api-push/device/gcm/";
     private WebView mWebView;
     private ProgressBar mProgressBar;
 
@@ -86,6 +80,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
+            boolean isTokenSent = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                    .getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false);
+
+            if (isTokenSent) return;
+
             mWebView.loadUrl("javascript:( function () { var resultSrc = localStorage.getItem('auth_token');" +
                     " window.HTMLOUT.onTokenReady(resultSrc); } ) ()");
         }
@@ -114,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             final String pushToken = PreferenceManager.getDefaultSharedPreferences(this).getString(Preferences.PUSH_TOKEN_READY, "");
             if (pushToken.equals("")) return;
-            final String deviceId = "Android_" + pushToken;
+            final String deviceId = "android_" + pushToken;
             JSONObject object = new JSONObject();
             object.put("name", deviceId);
             object.put("registration_id", pushToken);
@@ -142,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
                             PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit()
                                     .putBoolean(Preferences.SENT_TOKEN_TO_SERVER, true).apply();
                         }
-                        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
