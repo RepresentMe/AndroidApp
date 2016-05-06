@@ -1,5 +1,6 @@
 package com.softrangers.represent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String BASE_URL = "https://test.represent.me";
     private static final String TOKEN_URL = "https://test.represent.me/api-push/device/gcm/";
+    public static final String USER_EXTRAS = "USER EXTRAS";
+    public static final String NOTIFICATION_ACTION = "NOTIFICATION ACTION";
     private WebView mWebView;
     private ProgressBar mProgressBar;
 
@@ -56,6 +59,16 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setAppCacheEnabled(true);
         webSettings.setSaveFormData(true);
 
+        Intent intent = getIntent();
+        if (intent != null) {
+            String action = intent.getAction();
+            if (action != null && action.equals(NOTIFICATION_ACTION)) {
+                User user = intent.getExtras().getParcelable(USER_EXTRAS);
+                String url = BASE_URL + user.getUrl();
+                mWebView.loadUrl(url);
+                return;
+            }
+        }
         mWebView.loadUrl(BASE_URL);
     }
 

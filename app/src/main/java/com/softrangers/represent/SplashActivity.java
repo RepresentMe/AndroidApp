@@ -34,7 +34,6 @@ public class SplashActivity extends AppCompatActivity {
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                mRegistrationProgressBar.setVisibility(ProgressBar.GONE);
                 Intent intent1 = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent1);
                 finish();
