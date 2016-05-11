@@ -12,6 +12,8 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
+import java.util.Random;
+
 /**
  * Created by eduard on 06.05.16.
  */
@@ -78,6 +80,7 @@ public class MyGcmListenerService extends GcmListenerService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        int n_id =  new Random().nextInt();
+        notificationManager.notify(n_id /* ID of notification */, notificationBuilder.build());
     }
 }
