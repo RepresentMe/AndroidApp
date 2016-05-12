@@ -1,6 +1,11 @@
 package com.softrangers.represent;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -29,17 +34,23 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String BASE_URL = "https://represent.me";
-    private static final String TOKEN_URL = "https://represent.me/api-push/device/gcm/";
+    private static final String BASE_URL = "https://test.represent.me";
+    private static final String TOKEN_URL = "https://test.represent.me/api-push/device/gcm/";
     public static final String USER_EXTRAS = "USER EXTRAS";
     public static final String NOTIFICATION_ACTION = "NOTIFICATION ACTION";
     private WebView mWebView;
     private ProgressBar mProgressBar;
+    private AlarmManager mAlarmManager;
+    private Intent mIntent;
+    private PendingIntent mPendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        IntentFilter intentFilter = new IntentFilter("check auth token");
+        registerReceiver(mAuthTokenReceiver, intentFilter);
+        startCheckingAuthToken();
         mWebView = (WebView) findViewById(R.id.webView);
         mWebView.setWebChromeClient(new MyWebViewClient());
         mWebView.setWebViewClient(new WebClient());
@@ -93,13 +104,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-            boolean isTokenSent = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
-                    .getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false);
 
-            if (isTokenSent) return;
-
-            mWebView.loadUrl("javascript:( function () { var resultSrc = localStorage.getItem('auth_token');" +
-                    " window.HTMLOUT.onTokenReady(resultSrc); } ) ()");
         }
     }
 
@@ -113,13 +118,59 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private BroadcastReceiver mAuthTokenReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("check auth token")) {
+                mWebView.loadUrl("javascript:( function () { var resultSrc = localStorage.getItem('auth_token');" +
+                        " window.HTMLOUT.onTokenReady(resultSrc); } ) ()");
+            }
+        }
+    };
+
+    private void startCheckingAuthToken() {
+        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        mIntent = new Intent();
+        mIntent.setAction("check auth token");
+        mPendingIntent = PendingIntent.getBroadcast(this, 0, mIntent, 0);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5000, mPendingIntent);
+    }
+
+    private static String authToken;
     class MyJavaScriptInterface {
         @JavascriptInterface
         public void onTokenReady(String jsResult) {
             if (jsResult != null && !jsResult.equals("")) {
+                boolean isTokenSent = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false);
+
+                if (isTokenSent) return;
+                authToken = jsResult;
                 sendPushTokenToServer(jsResult);
+            } else {
+                deletePushTokenFromServer();
+                PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit().putBoolean(Preferences.SENT_TOKEN_TO_SERVER, false).apply();
             }
         }
+    }
+
+    private void deletePushTokenFromServer() {
+        Request request = new Request.Builder()
+                .url("https://test.represent.me/api-push/device/gcm/" + PreferenceManager.getDefaultSharedPreferences(this).getString(Preferences.PUSH_TOKEN_READY, ""))
+                .delete()
+                .addHeader("Authorization", "Token " + authToken)
+                .build();
+        new OkHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+
+            }
+        });
     }
 
     private void sendPushTokenToServer(String authToken) {
@@ -146,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
+                    startCheckingAuthToken();
                     Looper.prepare();
                     try {
                         String body = response.body().string();
@@ -169,5 +221,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void setValue(int progress) {
         this.mProgressBar.setProgress(progress);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mAuthTokenReceiver);
+        PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit().putBoolean(Preferences.SENT_TOKEN_TO_SERVER, false).apply();
+        if (mAlarmManager != null && mPendingIntent != null) {
+            mAlarmManager.cancel(mPendingIntent);
+        }
     }
 }
