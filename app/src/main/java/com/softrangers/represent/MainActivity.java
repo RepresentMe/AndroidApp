@@ -29,8 +29,8 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String BASE_URL = "https://test.represent.me";
-    private static final String TOKEN_URL = "https://test.represent.me/api-push/device/gcm/";
+    private static final String BASE_URL = "https://represent.me";
+    private static final String TOKEN_URL = "https://represent.me/api-push/device/gcm/";
     public static final String USER_EXTRAS = "USER EXTRAS";
     public static final String NOTIFICATION_ACTION = "NOTIFICATION ACTION";
     private WebView mWebView;
