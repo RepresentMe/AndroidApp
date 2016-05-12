@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TOKEN_URL = "https://test.represent.me/api-push/device/gcm/";
     public static final String USER_EXTRAS = "USER EXTRAS";
     public static final String NOTIFICATION_ACTION = "NOTIFICATION ACTION";
+    private static final String AUTH_TOKEN = "auth token";
     private WebView mWebView;
     private ProgressBar mProgressBar;
     private AlarmManager mAlarmManager;
@@ -104,7 +105,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-
+            mWebView.loadUrl("javascript:( function () { var resultSrc = localStorage.getItem('auth_token');" +
+                    " window.HTMLOUT.onTokenReady(resultSrc); } ) ()");
         }
     }
 
@@ -133,32 +135,34 @@ public class MainActivity extends AppCompatActivity {
         mIntent = new Intent();
         mIntent.setAction("check auth token");
         mPendingIntent = PendingIntent.getBroadcast(this, 0, mIntent, 0);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5000, mPendingIntent);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, mPendingIntent);
     }
 
-    private static String authToken;
     class MyJavaScriptInterface {
         @JavascriptInterface
         public void onTokenReady(String jsResult) {
             if (jsResult != null && !jsResult.equals("")) {
-                boolean isTokenSent = PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
-                        .getBoolean(Preferences.SENT_TOKEN_TO_SERVER, false);
-
-                if (isTokenSent) return;
-                authToken = jsResult;
-                sendPushTokenToServer(jsResult);
+                String oldToken = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString(AUTH_TOKEN, "no token");
+                if (!oldToken.equals(jsResult)) {
+                    deletePushTokenFromServer();
+                    sendPushTokenToServer(jsResult);
+                }
             } else {
-                deletePushTokenFromServer();
-                PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit().putBoolean(Preferences.SENT_TOKEN_TO_SERVER, false).apply();
+                boolean isSent = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getBoolean(Preferences.SENT_TOKEN_TO_SERVER, true);
+                if (isSent) {
+                    deletePushTokenFromServer();
+                    PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit().putBoolean(Preferences.SENT_TOKEN_TO_SERVER, false).apply();
+                }
             }
         }
     }
 
     private void deletePushTokenFromServer() {
+        String oldToken = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString(AUTH_TOKEN, "");
         Request request = new Request.Builder()
                 .url("https://test.represent.me/api-push/device/gcm/" + PreferenceManager.getDefaultSharedPreferences(this).getString(Preferences.PUSH_TOKEN_READY, ""))
                 .delete()
-                .addHeader("Authorization", "Token " + authToken)
+                .addHeader("Authorization", "Token " + oldToken)
                 .build();
         new OkHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -173,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void sendPushTokenToServer(String authToken) {
+    private void sendPushTokenToServer(final String authToken) {
         try {
             final String pushToken = PreferenceManager.getDefaultSharedPreferences(this).getString(Preferences.PUSH_TOKEN_READY, "");
             if (pushToken.equals("")) return;
@@ -205,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
                         if (message.equals("no details")) {
                             PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit()
                                     .putBoolean(Preferences.SENT_TOKEN_TO_SERVER, true).apply();
+                            PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit().putString(AUTH_TOKEN, authToken).apply();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
