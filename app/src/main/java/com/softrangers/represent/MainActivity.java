@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         mIntent = new Intent();
         mIntent.setAction("check auth token");
         mPendingIntent = PendingIntent.getBroadcast(this, 0, mIntent, 0);
-        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 15000, mPendingIntent);
+        mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 5000, mPendingIntent);
     }
 
     class MyJavaScriptInterface {
