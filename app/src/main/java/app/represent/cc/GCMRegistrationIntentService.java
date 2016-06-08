@@ -1,4 +1,4 @@
-package com.softrangers.represent;
+package app.represent.cc;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.softrangers.represent.R;
 
 /**
  * Created by eduard on 06.05.16.

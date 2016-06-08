@@ -1,4 +1,4 @@
-package com.softrangers.represent;
+package app.represent.cc;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.gcm.GcmListenerService;
+import com.softrangers.represent.R;
 
 import java.util.Random;
 

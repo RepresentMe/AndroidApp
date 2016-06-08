@@ -1,4 +1,4 @@
-package com.softrangers.represent;
+package app.represent.cc;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,4 +1,4 @@
-package com.softrangers.represent;
+package app.represent.cc;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -19,6 +19,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.softrangers.represent.R;
 
 import org.json.JSONObject;
 

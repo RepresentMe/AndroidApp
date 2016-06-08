@@ -1,4 +1,4 @@
-package com.softrangers.represent;
+package app.represent.cc;
 
 /**
  * Created by eduard on 06.05.16.
