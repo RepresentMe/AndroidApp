@@ -6,11 +6,11 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "com.softrangers.represent"
+        applicationId "app.represent.cc"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode 7
+        versionName "2.0"
     }
     buildTypes {
         release {
