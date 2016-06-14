@@ -36,8 +36,8 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String BASE_URL = "https://test.represent.me";
-    private static final String TOKEN_URL = "https://test.represent.me/api-push/device/gcm/";
+    private static final String BASE_URL = "https://represent.me";
+    private static final String TOKEN_URL = "https://represent.me/api-push/device/gcm/";
     public static final String USER_EXTRAS = "USER EXTRAS";
     public static final String NOTIFICATION_ACTION = "NOTIFICATION ACTION";
     private static final String AUTH_TOKEN = "auth token";
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
     private void deletePushTokenFromServer() {
         String oldToken = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString(AUTH_TOKEN, "");
         Request request = new Request.Builder()
-                .url("https://test.represent.me/api-push/device/gcm/" + PreferenceManager.getDefaultSharedPreferences(this).getString(Preferences.PUSH_TOKEN_READY, ""))
+                .url("https://represent.me/api-push/device/gcm/" + PreferenceManager.getDefaultSharedPreferences(this).getString(Preferences.PUSH_TOKEN_READY, ""))
                 .delete()
                 .addHeader("Authorization", "Token " + oldToken)
                 .build();
