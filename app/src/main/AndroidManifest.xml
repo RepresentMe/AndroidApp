@@ -10,9 +10,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="app.represent.cc.MainActivity"/>
+        <activity android:name="app.Represent.cc.MainActivity"/>
 
-        <activity android:name="app.represent.cc.SplashActivity">
+        <activity android:name="app.Represent.cc.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -31,14 +31,14 @@
         </receiver>
 
         <service
-            android:name="app.represent.cc.MyGcmListenerService"
+            android:name="app.Represent.cc.MyGcmListenerService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
-            android:name="app.represent.cc.MyInstanceIDListenerService"
+            android:name="app.Represent.cc.MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
@@ -46,7 +46,7 @@
         </service>
 
         <service
-            android:name="app.represent.cc.GCMRegistrationIntentService"
+            android:name="app.Represent.cc.GCMRegistrationIntentService"
             android:exported="false">
         </service>
     </application>
