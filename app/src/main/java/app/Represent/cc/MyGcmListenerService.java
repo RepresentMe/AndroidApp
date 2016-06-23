@@ -1,6 +1,7 @@
 package app.Represent.cc;
 
 import android.app.NotificationManager;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -9,9 +10,12 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 
 import com.google.android.gms.gcm.GcmListenerService;
 import com.softrangers.represent.R;
+
+import android.util.Log;
 
 import java.util.Random;
 
@@ -21,6 +25,10 @@ import java.util.Random;
 public class MyGcmListenerService extends GcmListenerService {
 
     private static final String TAG = "MyGcmListenerService";
+
+    final static String GROUP_KEY_ALL = "group_key_all";
+
+    static int notificationID = 0;
 
     /**
      * Called when message is received.
@@ -60,6 +68,11 @@ public class MyGcmListenerService extends GcmListenerService {
      * Create and show a simple notification containing the received GCM message.
      */
     private void sendNotification(User user) {
+        //limit to 5 notifications, send a sound if ID is 1
+        notificationID += 1;
+        if (notificationID > 5)
+            notificationID = 1;
+
         Intent intent = new Intent(this, MainActivity.class);
         intent.setAction(MainActivity.NOTIFICATION_ACTION);
         intent.putExtra(MainActivity.USER_EXTRAS, user);
@@ -75,13 +88,35 @@ public class MyGcmListenerService extends GcmListenerService {
                 .setContentTitle(user.getName())
                 .setContentText(user.getMessage())
                 .setAutoCancel(true)
-                .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
+                //.setGroup(GROUP_KEY_ALL);
+        if(notificationID == 1)
+            notificationBuilder.setSound(defaultSoundUri);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // we should look into using this for updated grouped notifications
+        //NotificationManagerCompat notificationManager =
+        //        NotificationManagerCompat.from(this);
 
-        int n_id =  new Random().nextInt();
-        notificationManager.notify(n_id /* ID of notification */, notificationBuilder.build());
+        //int n_id =  new Random().nextInt();
+        notificationManager.notify(notificationID, notificationBuilder.build());
+
+        //summary notifications, disabled
+        /*
+        Notification summaryNotification = new NotificationCompat.Builder(this)
+                .setContentTitle("New interactions on Represent")
+                .setSmallIcon(R.mipmap.ic_launcer_represent)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcer_represent))
+                .setStyle(new NotificationCompat.InboxStyle()
+                        .addLine("Alex Faaborg   Check this out")
+                        .addLine("Jeff Chang   Launch Party")
+                        .setBigContentTitle("New interactions on Represent")
+                        .setSummaryText("johndoe@gmail.com"))
+                .setGroup(GROUP_KEY_ALL)
+                .setGroupSummary(true)
+                .build();
+
+        notificationManager.notify(300103, summaryNotification);*/
     }
 }

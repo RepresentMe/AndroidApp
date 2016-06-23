@@ -9,8 +9,8 @@ android {
         applicationId "app.Represent.cc"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 7
-        versionName "2.0"
+        versionCode 8
+        versionName "2.1"
     }
     buildTypes {
         release {
